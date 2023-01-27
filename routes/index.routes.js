@@ -11,7 +11,7 @@ router.get("/", (req, res, next) => {
 });
 
 
-//GET /api/user/ - retrieves current user data
+//GET /api/user/ - retrieves current user data (which is carried in the req.payload object, that we created in the Login route)
 
 router.get("/user", isAuthenticated, (req, res) => {
   console.log('payload', req.payload)

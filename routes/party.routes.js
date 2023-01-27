@@ -2,7 +2,8 @@ const router = require("express").Router();
 const mongoose = require('mongoose');
 const Party = require("../models/Party.model")
 const User = require("../models/User.model")
-const Club = require("../models/Club.model")
+const Club = require("../models/Club.model");
+const { update } = require("../models/User.model");
 
 //POST /api/party - creates a new party
 router.post("/party", async (req, res, next) => {
@@ -32,20 +33,53 @@ router.put("/party/:partyId", async (req, res, next) => {
         return;
     }
 
+//we have 2 cases - user might want to edit the club OR not (together with the other party details)
+    //case 1 - user wants to edit the party details, but NOT the club where the party takes place
+    if (!req.body.club) {
+        Party.findByIdAndUpdate(partyId, {name, musicGenre, date, image }, {new:true})
+        .then((updatedParty) => res.json(updatedParty))
+    //case 2 - user wants to edit the party details, including the club for that party
+    //so we need to pull the Party from the parties array in the "old" Club
+    //and push the Part in the parites array of the "new" Club (req.body.club)
+    } else {
+        const foundParty = await Party.findById(partyId) 
+        console.log("foundParty ==> ", foundParty);
+        console.log("req.body.club AKA new club id ==> ", req.body.club)
+        console.log("old club for the party / foundParty.club ===> ", foundParty.club)
+        Club.findById(foundParty.club)
+        .then(oldClub => {
+            console.log("oldClub ===>", oldClub);
+            const partyIndex = oldClub.parties.indexOf(foundParty);
+            oldClub.parties.splice(partyIndex, 1);
+            console.log("current parties at oldClub ===> ", oldClub.parties)
+            oldClub.save()
+
+            Club.findById(req.body.club)
+            .then(newClub => {
+                console.log("newClub ==> ", newClub)
+                newClub.parties.push(foundParty);
+                console.log("current parties at newClub ===> ", newClub.parties)
+                newClub.save()
+            })
+        })
+        .then(() => {
+                return Party.findByIdAndUpdate(partyId, {name, club, musicGenre, date, image }, {new:true})
+                .then((updatedParty) => {
+                    console.log(updatedParty);
+                    res.json(updatedParty)
+                })
+            })
+        .catch(err => res.json(err));
+
+    }
+})    
+
 //1. find the party by id (without updating the party)
 //get the id of current club
 // remove the party from current Club parties array
 //update the Party with findbyIdAndUpdate 
 
-    const foundParty = await Party.findById(partyId) 
-    console.log("foundParty ==> ", foundParty);
-    Club.findById(foundParty.club, {$pull: {parties:foundParty._id }})
-    .then(() => {
-            return Party.findByIdAndUpdate(partyId, {name, club, musicGenre, image}, {new:true})
-            .then((updatedParty) => res.json(updatedParty))
-        })
 
-    .catch(err => res.json(err));
 
     // Party.findByIdAndUpdate(partyId, {name, club, musicGenre, image}, {new:true})
     // .then(updatedParty => {
@@ -65,6 +99,72 @@ router.put("/party/:partyId", async (req, res, next) => {
     // .then(foundParty => {
     //     return Club.findByIdAndUpdate(club, {$push: {parties:foundParty._id}})
     // });
+
+
+
+//PUT api/party/:partyId/attend-party - user says they will attend a specific party
+//user shouldn't be in the attendees list already - but we render this conditionally in the frontend (I think?)
+router.put("/party/:partyId/attend-party", (req, res, next) => {
+    const {partyId} = req.params;
+    console.log(req.payload._id);
+    const userId = req.payload._id
+    console.log("current user Id ===> ", userId)
+
+//TO DO:
+//find that specific party
+//push that userId inside that specific Party attendees array, then
+//grab the current user (req.payload._id)
+//push that partyId inside the current User parties array
+
+    Party.findById(partyId)
+    .then(foundParty => {
+        foundParty.attendees.push(userId)
+        foundParty.save()
+        .then(() => res.send(foundParty))
+
+        User.findById(userId)
+        .then(currentUser => {
+            currentUser.parties.push(partyId)
+            currentUser.save()
+            .then(() => res.json( currentUser))
+        })
+    })
+    .then(err => res.json(err))
+})
+
+//PUT api/party/:partyId/leave-party - user says they will not attend a specific party
+//need to render this conditionally in the frontend, if they previously said they were attending.
+//showing a button that toggles between "attend" and "leave"
+
+router.put("/party/:partyId/leave-party", (req, res, next) => {
+    const {partyId} = req.params;
+    const userId = req.payload._id;
+    console.log("current user Id ===> ", userId);
+//TO DO:
+//1) find that specific party the user doesnt want to attend anymore
+//remove the current user from that Party's attendees array
+/* 
+in the foundParty.attendees array, we need to splice the array where our currentUserId is
+
+*/
+//2) grab the current user 
+//remove that partyId from the arrays of parties in the User document
+    Party.find(partyId)
+    .then(foundParty => {
+        const attendeeIndex = indexOf(userId);
+        foundParty.attendees.splice(attendeeIndex, 1)
+        foundParty.save()
+        .then(() => res.send(foundParty))
+
+        User.find(userId)
+        .then(currentUser => {
+            const partyIndex = indexOf(partyId);
+            currentUser.parties.splice(partyIndex, 1)
+            currentUser.save()
+        })
+        .then(() => res.send(currentUser))
+    })
+    .catch(err => res.json(err))
 
 });
 
