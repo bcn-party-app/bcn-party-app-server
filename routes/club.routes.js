@@ -4,6 +4,22 @@ const Party = require("../models/Party.model")
 const User = require("../models/User.model")
 const Club = require("../models/Club.model")
 
+
+// POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
+router.post("/upload", fileUploader.single("image"), (req, res, next) => {
+    // console.log("file is: ", req.file)
+   
+    if (!req.file) {
+      next(new Error("No file uploaded!"));
+      return;
+    }
+    
+    // Get the URL of the uploaded file and send it as a response.
+    // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+    
+    res.json({ fileUrl: req.file.path });
+  });
+
 //POST /api/club - creates a new club
 router.post("/club", (req, res, next) => {
     const {name, streetName, streetNumber, image} = req.body;
