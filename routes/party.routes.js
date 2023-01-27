@@ -68,6 +68,18 @@ router.put("/party/:partyId", async (req, res, next) => {
 
 });
 
-//DELETE /api/party/:partyId - 
+//DELETE /api/party/:partyId - deletes a specific party by id
+router.delete("/party/:partyId", (req, res, next) => {
+    const {partyId} = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(partyId)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+    }
+
+    Party.findByIdAndRemove(partyId)
+    .then(() => res.json({message: `Party with partyId ${partyId} has been removed.`}))
+    .catch(err => res.json(err));
+});
 
 module.exports = router;

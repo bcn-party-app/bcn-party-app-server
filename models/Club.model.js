@@ -6,7 +6,6 @@ const clubSchema = new Schema(
       type: String,
       required: [true, "Name is required."]
     },
-    parties: [{ type: Schema.Types.ObjectId, ref: 'Party' }],
     streetName: {
         type: String,
         required: [true, "Street name is required."]
@@ -19,7 +18,8 @@ const clubSchema = new Schema(
     },
     image: {
         type: String
-    }
+    },
+    parties: [{ type: Schema.Types.ObjectId, ref: 'Party' }]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

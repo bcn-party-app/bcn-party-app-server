@@ -11,7 +11,6 @@ const partySchema = new Schema(
         ref: "Club",
         required: [true, "Club is required."]
     },
-    attendees: [{type: Schema.Types.ObjectId, ref: 'User' }],
     date: {
         type: Date,
         required: [true, "Date is required."]
@@ -23,7 +22,8 @@ const partySchema = new Schema(
     },
     image: {
         type: String
-    }
+    },
+    attendees: [{type: Schema.Types.ObjectId, ref: 'User' }]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
