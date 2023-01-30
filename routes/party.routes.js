@@ -112,11 +112,10 @@ router.put("/party/:partyId", async (req, res, next) => {
 
 //PUT api/party/:partyId/attend-party - user says they will attend a specific party
 //user shouldn't be in the attendees list already - but we render this conditionally in the frontend (I think?)
-router.put("/party/:partyId/attend-party", (req, res, next) => {
+router.put("/party/:partyId/attend-party", isAuthenticated, (req, res, next) => {
     const {partyId} = req.params;
-    console.log(req.payload._id);
+    console.log("req.payload._id", req.payload._id);
     const userId = req.payload._id
-    console.log("current user Id ===> ", userId)
 
 //TO DO:
 //find that specific party
