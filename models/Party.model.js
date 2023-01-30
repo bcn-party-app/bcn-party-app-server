@@ -23,7 +23,8 @@ const partySchema = new Schema(
     image: {
         type: String
     },
-    attendees: [{type: Schema.Types.ObjectId, ref: 'User' }]
+    attendees: [{type: Schema.Types.ObjectId, ref: 'User' }],
+    owner: {type: Schema.Types.ObjectId, ref: 'User' }
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

@@ -4,12 +4,15 @@ const Party = require("../models/Party.model")
 const User = require("../models/User.model")
 const Club = require("../models/Club.model");
 const { update } = require("../models/User.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 //POST /api/party - creates a new party
-router.post("/party", async (req, res, next) => {
+//this needs to be protected w isAuthenticated mw
+router.post("/party", isAuthenticated, async (req, res, next) => {
     const {name, clubId, date, musicGenre, image} = req.body;
-
-    const newParty = await Party.create({name, club: clubId, date, musicGenre, image, attendees: []})
+    //how do I access the owner here?
+    const owner = req.payload._id
+    const newParty = await Party.create({name, club: clubId, date, musicGenre, image, owner, attendees: []})
     Club.findByIdAndUpdate(clubId, { $push: { parties:newParty._id } })
     .then(() => res.json(newParty))
     .catch(err => res.json(err));
@@ -40,7 +43,7 @@ router.put("/party/:partyId", async (req, res, next) => {
         .then((updatedParty) => res.json(updatedParty))
     //case 2 - user wants to edit the party details, including the club for that party
     //so we need to pull the Party from the parties array in the "old" Club
-    //and push the Part in the parites array of the "new" Club (req.body.club)
+    //and push the Part in the parties array of the "new" Club (req.body.club)
     } else {
         const foundParty = await Party.findById(partyId) 
         console.log("foundParty ==> ", foundParty);
@@ -61,14 +64,14 @@ router.put("/party/:partyId", async (req, res, next) => {
                 console.log("current parties at newClub ===> ", newClub.parties)
                 newClub.save()
             })
-        })
-        .then(() => {
+            .then(() => {
                 return Party.findByIdAndUpdate(partyId, {name, club, musicGenre, date, image }, {new:true})
                 .then((updatedParty) => {
                     console.log(updatedParty);
                     res.json(updatedParty)
                 })
             })
+        })
         .catch(err => res.json(err));
 
     }
@@ -120,13 +123,13 @@ router.put("/party/:partyId/attend-party", (req, res, next) => {
     .then(foundParty => {
         foundParty.attendees.push(userId)
         foundParty.save()
-        .then(() => res.send(foundParty))
+        .then(() => res.json(foundParty))
 
         User.findById(userId)
         .then(currentUser => {
             currentUser.parties.push(partyId)
             currentUser.save()
-            .then(() => res.json( currentUser))
+            .then(() => res.json(currentUser))
         })
     })
     .then(err => res.json(err))
@@ -154,7 +157,7 @@ in the foundParty.attendees array, we need to splice the array where our current
         const attendeeIndex = indexOf(userId);
         foundParty.attendees.splice(attendeeIndex, 1)
         foundParty.save()
-        .then(() => res.send(foundParty))
+        .then(() => res.json(foundParty))
 
         User.find(userId)
         .then(currentUser => {
@@ -162,7 +165,7 @@ in the foundParty.attendees array, we need to splice the array where our current
             currentUser.parties.splice(partyIndex, 1)
             currentUser.save()
         })
-        .then(() => res.send(currentUser))
+        .then(() => res.json(currentUser))
     })
     .catch(err => res.json(err))
 
