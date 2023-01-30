@@ -5,6 +5,7 @@ const User = require("../models/User.model")
 const Club = require("../models/Club.model");
 const { update } = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+const fileUploader = require("../config/cloudinary.config");
 
 //POST /api/party - creates a new party
 //this needs to be protected w isAuthenticated mw
