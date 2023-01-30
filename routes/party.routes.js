@@ -9,10 +9,14 @@ const fileUploader = require("../config/cloudinary.config");
 
 //POST /api/party - creates a new party
 //this needs to be protected w isAuthenticated mw
-router.post("/party", isAuthenticated, async (req, res, next) => {
-    const {name, clubId, date, musicGenre, image} = req.body;
+router.post("/party",isAuthenticated, async (req, res, next) => {
+    const {name, club, date, musicGenre, image} = req.body;
+    console.log("req.body.club ===> ", req.body.club)
+    const clubId = req.body.club
     //how do I access the owner here?
+    console.log("req.payload._id ===>", req.payload._id)
     const owner = req.payload._id
+    
     const newParty = await Party.create({name, club: clubId, date, musicGenre, image, owner, attendees: []})
     Club.findByIdAndUpdate(clubId, { $push: { parties:newParty._id } })
     .then(() => res.json(newParty))
