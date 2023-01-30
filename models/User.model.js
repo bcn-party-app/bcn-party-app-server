@@ -18,6 +18,9 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Name is required."],
     },
+    image: {
+      type: String
+  },
     parties: [{type: Schema.Types.ObjectId, ref: 'Party' }],
   },
   {
