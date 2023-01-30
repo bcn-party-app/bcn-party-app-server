@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Party = require("../models/Party.model")
 const User = require("../models/User.model")
 const Club = require("../models/Club.model")
+const fileUploader = require("../config/cloudinary.config");
 
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL

@@ -4,6 +4,7 @@ const Party = require("../models/Party.model")
 const User = require("../models/User.model")
 const Club = require("../models/Club.model");
 const { update } = require("../models/User.model");
+const fileUploader = require("../config/cloudinary.config");
 
 //POST /api/party - creates a new party
 router.post("/party", async (req, res, next) => {
