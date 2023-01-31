@@ -117,7 +117,7 @@ router.put("/party/:partyId", async (req, res, next) => {
     // .then(foundParty => {
     //     //remove the party from the current club (remove from parties array)
     //     return Club.findByIdAndUpdate(foundParty.club, { $pull: {parties:foundParty._id }})
-    ß
+    
     // })
     // .catch(err => res.json(err));
 
