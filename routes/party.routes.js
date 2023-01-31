@@ -100,6 +100,7 @@ router.put("/party/:partyId", async (req, res, next) => {
     // .then(foundParty => {
     //     //remove the party from the current club (remove from parties array)
     //     return Club.findByIdAndUpdate(foundParty.club, { $pull: {parties:foundParty._id }})
+    ß
     // })
     // .catch(err => res.json(err));
 
@@ -176,17 +177,29 @@ in the foundParty.attendees array, we need to splice the array where our current
 });
 
 //DELETE /api/party/:partyId - deletes a specific party by id
-router.delete("/party/:partyId", (req, res, next) => {
+//TO DO: 
+//WE NEED TO REMOVE THAT PARTY FROM THAT CLUB'S party ARRAY 
+    //grab id of that club
+//we need to remove that party from the user's Parties array?
+    //find the user id
+router.delete("/party/:partyId", async (req, res, next) => {
     const {partyId} = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(partyId)) {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
     }
+//rempove party from its Club's array of Parties
+const foundClub = await Club.findById{}
 
-    Party.findByIdAndRemove(partyId)
-    .then(() => res.json({message: `Party with partyId ${partyId} has been removed.`}))
-    .catch(err => res.json(err));
+//remove party from the Parties array in every User that was attending it
+
+//remove specific Party
+    const partyToRemove = await Party.findByIdAndRemove(partyId);
+    res.json({message: `Party with partyId ${partyId} has been removed.`})
+    res.json(err);
+
+
 });
 
 module.exports = router;
