@@ -8,6 +8,24 @@ const { isAuthenticated } = require("../middleware/jwt.middleware");
 const fileUploader = require("../config/cloudinary.config");
 
 //POST /api/party - creates a new party - WORKING 🟢
+
+// POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
+router.post("/upload", fileUploader.single("image"), (req, res, next) => {
+    // console.log("file is: ", req.file)
+   
+    if (!req.file) {
+      next(new Error("No file uploaded!"));
+      return;
+    }
+    
+    // Get the URL of the uploaded file and send it as a response.
+    // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+    
+    res.json({ fileUrl: req.file.path });
+  });
+
+  
+//POST /api/party - creates a new party
 //this needs to be protected w isAuthenticated mw
 router.post("/party",isAuthenticated, async (req, res, next) => { 
     const {name, club, date, musicGenre, image} = req.body;
@@ -16,7 +34,7 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
     //how do I access the owner here?
     console.log("req.payload._id ===>", req.payload._id)
     const owner = req.payload._id
-    
+
     const newParty = await Party.create({name, club: clubId, date, musicGenre, image, owner, attendees: []})
     Club.findByIdAndUpdate(clubId, { $push: { parties:newParty._id } })
     .then(() => res.json(newParty))
@@ -72,7 +90,7 @@ router.put("/party/:partyId", async (req, res, next) => {
                 console.log("current parties at newClub ===> ", newClub.parties)
                 newClub.save()
             })
-            .then(() => {
+        .then(() => {
                 return Party.findByIdAndUpdate(partyId, {name, club, musicGenre, date, image }, {new:true})
                 .then((updatedParty) => {
                     console.log(updatedParty);
@@ -120,6 +138,7 @@ router.put("/party/:partyId/attend-party", isAuthenticated, async (req, res, nex
     const {partyId} = req.params;
     console.log("req.payload._id", req.payload._id);
     const userId = req.payload._id
+    console.log("current user Id ===> ", userId)
 
 //TO DO:
 //find that specific party

@@ -21,7 +21,7 @@ router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     res.json({ fileUrl: req.file.path });
   });
 
-//POST /api/club - creates a new club
+//POST /api/club - creates a new club - WORKING 🟢
 router.post("/club", (req, res, next) => {
     const {name, streetName, streetNumber, image} = req.body;
 
@@ -30,7 +30,7 @@ router.post("/club", (req, res, next) => {
     .catch(err => res.json(err));
 })
 
-//GET /api/club - returns all the clubs
+//GET /api/club - returns all the clubs - WORKING 🟢
 router.get("/club", (req, res, next) => {
     Club.find()
     .populate("parties")
