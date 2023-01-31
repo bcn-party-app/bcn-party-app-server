@@ -117,6 +117,7 @@ router.put("/party/:partyId", async (req, res, next) => {
     // .then(foundParty => {
     //     //remove the party from the current club (remove from parties array)
     //     return Club.findByIdAndUpdate(foundParty.club, { $pull: {parties:foundParty._id }})
+    ß
     // })
     // .catch(err => res.json(err));
 
@@ -194,17 +195,45 @@ in the foundParty.attendees array, we need to splice the array where our current
 });
 
 //DELETE /api/party/:partyId - deletes a specific party by id
-router.delete("/party/:partyId", (req, res, next) => {
-    const {partyId} = req.params;
+//TO DO: 
+//WE NEED TO REMOVE THAT PARTY FROM THAT CLUB'S party ARRAY 
+    //grab id of that club
+//we need to remove that party from the user's Parties array?
+    //find the user id
+router.delete("/party/:partyId", async (req, res, next) => {
+    const {partyId} = req.params; 
 
     if (!mongoose.Types.ObjectId.isValid(partyId)) {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
     }
+//remove party from its Club's array of Parties - DONE?🟠 NEEDS TO BE TESTED
+    let partyToRemove = await Party.findById(partyId);
+    const currentClub = await Club.findById(partyToRemove.club) //is this the right way of grabbing the club id?
+    const partyIndexClub = currentClub.parties.indexOf(partyId)
+    currentClub.parties.splice(partyIndexClub,1)
+    currentClub.save();
 
-    Party.findByIdAndRemove(partyId)
-    .then(() => res.json({message: `Party with partyId ${partyId} has been removed.`}))
-    .catch(err => res.json(err));
+//remove party from the Parties array in every User that was attending it:
+    //we can look at the attendees array in that party (who are Users)
+    //then remove the partyId from their [parties] array
+    const attendees = partyToRemove.attendees
+    
+    attendees.forEach(attendee => {
+        //find index of that Party in the Party array for every existing User
+        //splice it from their Party array
+        //save user
+        const singleAttendee = User.findById(attendee._id)
+        partyIndex = singleAttendee.parties.indexOf(partyId)
+        singleAttendee.parties.splice(partyIndex,1)
+        singleAttendee(save);
+    });
+
+//remove specific Party - DONE✅
+    partyToRemove = await Party.findByIdAndRemove(partyId);
+    res.json({message: `Party with partyId ${partyId} has been removed.`})
+    res.json(err);
+
 });
 
 module.exports = router;
