@@ -44,8 +44,7 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
 //GET /api/party - returns all the parties - WORKING 🟢
 router.get("/party", (req, res, next) => {
     Party.find()
-    // .populate("attendees")
-    // .populate("club")
+    .populate("club owner")
     .then(allParties => res.json(allParties))
     .catch(err => res.json(err));
 });
