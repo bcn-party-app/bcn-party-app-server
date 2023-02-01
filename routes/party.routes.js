@@ -45,8 +45,20 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
 router.get("/party", (req, res, next) => {
     Party.find()
     .populate("attendees")
+    .populate("club")
     .then(allParties => res.json(allParties))
-    .catch(err => res.json(err))
+    .catch(err => res.json(err));
+});
+
+//GET /api/party/:partyId - retrieve a party by id
+router.get("/party/:partyId", async (req, res, next) => {
+    const {partyId} = req.params;
+
+    Party.findById(partyId)
+    .populate("attendees")
+    .populate("club")
+    .then(foundParty => res.json(foundParty))
+    .catch(err => res.json(err));
 });
 
 //=====================================================================
