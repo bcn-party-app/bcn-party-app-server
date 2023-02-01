@@ -44,14 +44,14 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
 //GET /api/party - returns all the parties - WORKING 🟢
 router.get("/party", (req, res, next) => {
     Party.find()
-    .populate("attendees")
-    .populate("club")
+    // .populate("attendees")
+    // .populate("club")
     .then(allParties => res.json(allParties))
     .catch(err => res.json(err));
 });
 
 //GET /api/party/:partyId - retrieve a party by id
-router.get("/party/:partyId", async (req, res, next) => {
+router.get("/party/:partyId", (req, res, next) => {
     const {partyId} = req.params;
 
     Party.findById(partyId)
@@ -235,7 +235,7 @@ router.delete("/party/:partyId", async (req, res, next) => {
     const attendees = partyToRemove.attendees
     console.log("ATTENDEES ARR ", attendees)
     
-    // ?? How can I use async/await here?? 🟠
+    // works, but - How can I use async/await here?? 🟠
     attendees.forEach(attendee => {
         //find index of that Party in the Party array for every existing User
         //splice it from their Party array
