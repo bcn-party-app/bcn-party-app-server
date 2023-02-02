@@ -7,7 +7,6 @@ const { update } = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 const fileUploader = require("../config/cloudinary.config");
 
-//POST /api/party - creates a new party - WORKING 🟢
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("image"), (req, res, next) => {
@@ -24,8 +23,8 @@ router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     res.json({ fileUrl: req.file.path });
   });
 
-  
-//POST /api/party - creates a new party
+//POST /api/party - creates a new party - WORKING 🟢 
+
 //this needs to be protected w isAuthenticated mw
 router.post("/party",isAuthenticated, async (req, res, next) => { 
     const {name, club, date, musicGenre, image} = req.body;
@@ -42,21 +41,22 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
 })
 
 //GET /api/party - returns all the parties - WORKING 🟢
-router.get("/party", (req, res, next) => {
+router.get("/party", isAuthenticated, (req, res, next) => {
     Party.find()
     .populate("club owner")
-    .then(allParties => res.json(allParties))
+    .then(allParties => res.json(allParties) )
     .catch(err => res.json(err));
 });
 
 //GET /api/party/:partyId - retrieve a party by id
-router.get("/party/:partyId", async (req, res, next) => {
+router.get("/party/:partyId", isAuthenticated, (req, res, next) => {
     const {partyId} = req.params;
 
     Party.findById(partyId)
     .populate("attendees")
     .populate("club")
     .then(foundParty => res.json(foundParty))
+
     .catch(err => res.json(err));
 });
 
