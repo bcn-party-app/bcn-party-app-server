@@ -27,6 +27,6 @@ const clubSchema = new Schema(
   }
 );
 
-const Club = model("club", clubSchema);
+const Club = model("Club", clubSchema);
 
 module.exports = Club;
