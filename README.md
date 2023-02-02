@@ -1,5 +1,3 @@
-# bcn-party-app-server
+# .find()
 
-[![Deploy to Cyclic](https://deploy.cyclic.sh/
-
-button.svg)](https://deploy.cyclic.sh/)
+.find() is a web app that lets you create clubs, create parties, attend parties and check who else is going.
