@@ -6,11 +6,7 @@ const partySchema = new Schema(
       type: String,
       required: [true, "Name is required."],
     },
-    club: {
-        type: Schema.Types.ObjectId,
-        ref: "Club",
-        required: [true, "Club is required."]
-    },
+    club: {type: Schema.Types.ObjectId, ref: "Club"},
     date: {
         type: Date,
         required: [true, "Date is required."]
@@ -35,3 +31,6 @@ const partySchema = new Schema(
 const Party = model("Party", partySchema);
 
 module.exports = Party;
+
+
+// required: [true, "Club is required."]

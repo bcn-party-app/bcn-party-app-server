@@ -43,8 +43,10 @@ router.post("/party",isAuthenticated, async (req, res, next) => {
 //GET /api/party - returns all the parties - WORKING 🟢
 router.get("/party", isAuthenticated, (req, res, next) => {
     Party.find()
-    .populate("club owner")
-    .then(allParties => res.json(allParties) )
+    .then(allParties => {
+        console.log("allParties", allParties)
+        res.json(allParties)
+    } )
     .catch(err => res.json(err));
 });
 
@@ -54,7 +56,7 @@ router.get("/party/:partyId", isAuthenticated, (req, res, next) => {
 
     Party.findById(partyId)
     .populate("attendees")
-    .populate("club")
+    // .populate("club")
     .then(foundParty => res.json(foundParty))
 
     .catch(err => res.json(err));
@@ -148,7 +150,7 @@ router.put("/party/:partyId", async (req, res, next) => {
 router.put("/party/:partyId/attend-party", isAuthenticated, async (req, res, next) => {
     const {partyId} = req.params;
     console.log("req.payload._id", req.payload._id);
-    const userId = req.payload._id
+    const userId = req.body
     console.log("current user Id ===> ", userId)
 
 //TO DO:
