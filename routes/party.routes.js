@@ -234,7 +234,7 @@ router.delete("/party/:partyId", async (req, res, next) => {
     const attendees = partyToRemove.attendees
     console.log("ATTENDEES ARR ", attendees)
     
-    // ?? How can I use async/await here?? 🟠
+    // works, but - How can I use async/await here?? 🟠
     attendees.forEach(attendee => {
         //find index of that Party in the Party array for every existing User
         //splice it from their Party array
